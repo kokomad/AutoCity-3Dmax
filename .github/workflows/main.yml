@@ -20,8 +20,6 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
-
       - name: Prepare web files
         run: |
           mkdir -p www
@@ -34,6 +32,9 @@ jobs:
           npx cap init "AutoCity 3D" com.khader.autocity --web-dir=www
           npx cap add android
           npx cap sync android
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
 
       - name: Build debug APK
         run: |
