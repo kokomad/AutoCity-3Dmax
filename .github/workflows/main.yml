@@ -11,19 +11,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v3
+
+      - name: Prepare web files
+        run: |
+          mkdir -p www
+          cp -r index.html manifest.json sw.js assets www/
+
+      - name: Create Capacitor project
+        run: |
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "AutoCity 3D" com.khader.autocity --web-dir=www
+          npx cap add android
+          npx cap sync android
 
       - name: Build debug APK
         run: |
-          chmod +x ./gradlew
+          cd android
+          chmod +x gradlew
           ./gradlew assembleDebug
 
       - uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: app/build/outputs/apk/debug/*.apk
+          name: AutoCity-APK
+          path: android/app/build/outputs/apk/debug/*.apk
